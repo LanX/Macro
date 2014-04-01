@@ -1,0 +1,15 @@
+;;; Automatically generated on Wed Mar 19 03:00:41 2014
+;;; Invoked by lanx@nc10-ubuntu using 23.1.50.1
+(setq-default kill-ring '(";(require 'frame-restore)"))
+(setq-default session-file-alist '(("~/.emacs.d/elisp/init.el" 323 381 1 nil nil 323 (overwrite-mode)) ("~/.emacs.d/elisp/session" 1 nil 1 nil nil 1 (overwrite-mode))))
+(setq-default file-name-history '("~/perl/talks/ExtendingSyntax/modules/Macro/t/is_macro.t" "~/perl/talks/ExtendingSyntax/modules/Macro/t/" "~/org/todo.org" "~/perl/talks/ExtendingSyntax/concept.org" "~/Downloads/40.srt" "~/perl/talks/ExtendingSyntax/modules/Macro/t/pod-coverage.t" "~/bin/prove_pm" "/usr/local/share/perl/5.10.0/Test/Pod/Coverage.pm" "~/perl/talks/ExtendingSyntax/modules/Macro/t/pod.t" "~/perl/IPL/poset.pl" "~/perl/talks/ExtendingSyntax/modules/macro.pl" "~/perl/talks/ExtendingSyntax/modules/B/Macro.pm" "~/perl/talks/ExtendingSyntax/modules/Macro/t/00.load.t" "~/perl/talks/ExtendingSyntax/modules/Macro/lib/Macro.pm" "~/Mietsache/Meisinger_out_11.03.2014.tex" "~/org/tst-brief.tex" "~/org/todo.html" "~/Mietsache/2013.12.16.html" "~/Mietsache/Mail_Dielen_03.11.2007.pdf" "~/Mietsache/Meisinger_out_07.01.2014.pdf" "~/perl/talks/Recordings-Lightning/master.tex" "~/B/PL/PM/caller_alias.pl" "~/perl/talks/ipl-en/master.tex" "~/perl/IPL/ParseSyntax.pm" "~/perl/talks/egentic/Function_Calls/talk_aprameter_check2.org" "~/perl/talks/egentic/Function_Calls/intro.org" "~/perl/talks/egentic/Function_Calls/calling.org" "~/perl/talks/egentic/Function_Calls/master.org" "/usr/share/perl/5.10/perl5db.pl" "~/perl/multidata.pl"))
+(setq-default search-ring '("$self" "dbout" "is_macro" "ref_macro" "$c_pp_entersub_orig" "bl" "xbla" "$module" "couldn't" "pod_coverage_ok" "require" "couldn" "all_modules" "set_closed_over" "$h_closed_over"))
+(setq-default regexp-search-ring '("#.*RL" "\\w<" "^$" "commen." "ä|ö|ü" "[^a-zA-Z_ #*{}()+-:]" "[^a-zA-Z_ #*{}()+-]:" "[^a-zA-Z_ #*{}()+-]" "[^a-zA-Z_ #*{}()]" "[^a-zA-Z_]" "^[^	]+	" "^<" "^if" "
+\\\\s*" "
+\\s*" "(2008)"))
+(setq-default Info-search-history '("desk"))
+(setq-default buffer-name-history '("is_macro.t<2>" "*Buffer List*" "scrap.pl" "session" "elisp/init.el"))
+(setq-default command-history '((find-file "~/perl/talks/ExtendingSyntax/modules/Macro/t/" t) (kill-buffer "is_macro.t<2>") (rename-uniquely) (kill-buffer "*Buffer List*") (find-file "~/.emacs.d/elisp/init.el" t) (desktop-change-dir "~/Audi/") (desktop-change-dir "~/") (switch-to-buffer "scrap.pl") (customize-group "desktop") (Info-menu "Saving Emacs Sessions" nil) (Info-menu "Emacs" nil) (Info-search "desk") (describe-variable (quote desktop-dirname)) (describe-function (quote desktop-save-in-desktop-dir)) (desktop-save-in-desktop-dir) (find-file "~/Audi/scrap.pl" t) (kill-buffer "session") (ffap) (switch-to-buffer "elisp/init.el")))
+(setq-default extended-command-history '("rename-uniquely" "desktop-change-dir" "customize-group" "set-variable" "desktop-save-in-desktop-dir" "ffap"))
+(setq-default minibuffer-history '("desktop" "Saving Emacs Sessions" "Emacs" "desktop-dirname" "desktop-save-in-desktop-dir"))
+(setq-default yes-or-no-p-history '("yes"))
