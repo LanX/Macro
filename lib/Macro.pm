@@ -1,5 +1,15 @@
 package Macro;
 
+our $VERSION=0.0.3;
+
+# ----------------------------------------
+#  Modulino Testing
+# ----------------------------------------
+
+#  run tests if called as script
+print `prove -b "../t"` unless caller();
+#print `cd ..;make test` unless caller();
+
 use strict;
 use warnings;
 use Carp;
@@ -15,28 +25,35 @@ use PadWalker;
 #  Debugging Helpers
 # ----------------------------------------
 
-our $DB=1;						    # global Debug Flag
+our $DB=0;						    # global Debug Flag
+
+=head2 dbout
+
+say for backwards-compatibility.
+
+=cut
 
 sub say {
   local $,="\t";
   print "@_\n"
 }
 
+=head2 say
+
+debug output, controled by global $DB
+
+=cut
+
 sub dbout {
   return unless $DB;
-  local $|=1;
-#  say ("DB:",@_);
-  Test::More::diag("DB: @_\n") if exists &Test::More::diag;
+  #local $|=1;
+  #  say ("DB:",@_);
+  my @caller=(caller(0))[0..2];
+  Test::More::diag("DB $DB: @_\n") if exists &Test::More::diag;
 }
 
 
 
-# ----------------------------------------
-#  Modulino Testing
-# ----------------------------------------
-
-#  run tests if called as script
-print `prove -b "../t"` unless caller();
 
 
 # ----------------------------------------
@@ -301,6 +318,12 @@ sub is_macro {
   return;
 }
 
+#=head2 bla
+
+#=cut
+  
+sub blaxxx {
+}
 
 
 
@@ -336,6 +359,12 @@ sub import {
   my $import = "sub ${dest_pkg}::Macro : ATTR(CODE) { goto \&${src_pkg}::Macro }";
   eval $import;
 }
+
+=head2 Macro
+
+Attribute to mark subs as macros.
+
+=cut
 
 sub Macro {
   my ( $package, $symbol, $referent, $attr, $data, $phase, $filename,

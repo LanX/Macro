@@ -7,7 +7,7 @@ WriteMakefile(
     NAME            => 'Macro',
     AUTHOR          => 'Rolf Michael Langsdorf <lanx@cpan.org>',
     VERSION_FROM    => 'lib/Macro.pm',
-    ABSTRACT_FROM   => 'lib/Macro.pm',
+    ABSTRACT_FROM   => 'lib/Macro.pod.tpl',
     PL_FILES        => {},
     PREREQ_PM    => {
         'Test::More'    => 0,

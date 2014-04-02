@@ -2,6 +2,9 @@ use strict;
 use warnings;
 
 my $modulename="Macro";
+chdir '/home/lanx/perl/talks/ExtendingSyntax/modules/Macro/lib/';
+
+
 
 my $api_pod;
 sub grab (_;@)  {

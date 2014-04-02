@@ -1,10 +1,12 @@
 #!perl
 
-
+#do "../lib/podbuilder.pl";
 
 use Test::More;
 
 eval "use Test::Pod 1.14";
+print $@;
+
 
 
 plan skip_all => "Test::Pod 1.14 required for testing POD" if $@;
