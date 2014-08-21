@@ -19,7 +19,7 @@ open my $module, "<", "$modulename.pm"
   or die "'$modulename.pm' $!";
 
 while  (<$module>) {
-  if ( /^=head2/ .. /^=cut/ ) {
+  if ( /^=head[12]/ .. /^=cut/ ) {
     grab;
   }
 

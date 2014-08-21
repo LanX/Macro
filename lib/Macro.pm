@@ -19,41 +19,7 @@ use B::Deparse;
 use B::Concise qw(set_style add_callback);
 use PadWalker;
 
-
-
-# ----------------------------------------
-#  Debugging Helpers
-# ----------------------------------------
-
-our $DB=0;						    # global Debug Flag
-
-=head2 dbout
-
-say for backwards-compatibility.
-
-=cut
-
-sub say {
-  local $,="\t";
-  print "@_\n"
-}
-
-=head2 say
-
-debug output, controled by global $DB
-
-=cut
-
-sub dbout {
-  return unless $DB;
-  #local $|=1;
-  #  say ("DB:",@_);
-  my @caller=(caller(0))[0..2];
-  Test::More::diag("DB $DB: @_\n") if exists &Test::More::diag;
-}
-
-
-
+our $DEBUG=0;						    # global Debug Flag
 
 
 # ----------------------------------------
@@ -71,14 +37,14 @@ sub dbout {
   
       #- original text of sub-call
       my $entersub_text = $c_pp_entersub_orig->(@_);
-      dbout "entersub_text: $entersub_text";
+      dbout( "entersub_text: $entersub_text" );
 
       #- decompose call_text 
       my ( $fullname, $args ) = ( $entersub_text =~ m/ ([:\w]+) \( (.*) \) /x );
-      dbout "name: $fullname, args: $args";
+      dbout( "name: $fullname, args: $args" );
 
       my $current_package = $self->{'curstash'};
-      dbout "$current_package";
+      dbout( "$current_package" );
 
       my $c_macro = ref_macro ( $fullname, $current_package );
 
@@ -96,12 +62,15 @@ sub dbout {
 
 =head2 expand_coderef
 
-Returns deparse_coderef(@args) with activated macros expansion.
+Expands macros in coderef.
+Returns altered source.
+
+Arguments tunneld to deparse_coderef(@_)
 
 =cut
 
-  
-  sub expand_coderef {
+
+sub expand_coderef {
 
     #- save original
     $c_pp_entersub_orig	       = \&B::Deparse::pp_entersub;
@@ -142,48 +111,56 @@ Returns new body text.
 =cut
 
 sub expand_sub {
-  my ($subname) = @_;
+  my ($sub,%opt) = @_;
 
-  #local $DB=1;
-  
-  $subname = _fullname( $subname, (caller)[0]);
-  
+  #local $DEBUG=1;
+  my ($c_old, $subname);
 
-  my $c_old = \&{$subname};
+  my $subtype = ref $sub;
+  if ($subtype eq "CODE") {
+      $c_old = $sub;
+  }
+  elsif (! $subtype) {
+      $subname = _fullname( $sub, (caller)[0]);
+      $c_old = \&{$subname};
+  }
 
   my $h_closed_over = _closed_over($c_old);
 
   my $newbody = expand_coderef($c_old);
-  dbout "body: $newbody";
+
+  # # - wrap pre and post code
+  # {
+  #     no warnings 'uninitialized';
+  #     $newbody = $opt{pre} . "\n$newbody\n". $opt{post};
+  # }
   
-  #- compile new body
+  dbout( "body: $newbody" );
+  
+  #- compile new body to sub
   #  my $code = eval "sub $newbody";
 
   my $c_new = body2coderef ($newbody ,
-			    package  => (caller)[0] ,
+			    package  => (caller)[0] , 	    # ??? package from qualified subname?
 			    closed_over => $h_closed_over,
 			   );
 
-  my $codetype = ref $c_new;
-
-  # - replace code
-  {
+  # - reinstall named sub
+  if ($subname and !$subtype)  {
     no strict qw/refs/;
     no warnings 'redefine';
     *{$subname} = $c_new;
   }
 
-  # TODO WHAT???
-#   unless ($c_new and $codetype eq "CODE") {
-#     dbout "\ntype='$codetype' \nnewbody='$newbody' ";
-# #    die "Eval expansion failed!" unless $c_new and ref $c_new eq "Code";
-#   }
 
   #-  Reassign closed over variables 
   _set_closed_over( $c_new, $h_closed_over );
 
-  # - ??? gute idee?
-  return $newbody; 
+  #- return new coderef
+  # ??? extra info like old/new sourcetext?
+  #     - blessing code-ref?
+  #     - returning list if wantarray?
+  return $c_new; 
 }
 
 
@@ -231,6 +208,15 @@ __ERR__
   return $c_sub;
 }
 
+# ----------------------------------------
+#  Macro Management
+# ----------------------------------------
+
+=head1 Macro Management
+
+Handling of Macros
+
+=cut
 
 =head2 ref_macro NAME, CURRENT_PACKAGE
 
@@ -273,9 +259,6 @@ sub _fullname {
 }
 
 
-# ----------------------------------------
-#  Macro helpers
-# ----------------------------------------
 
 =head2 def_macro NAME, BLOCK
 
@@ -318,12 +301,6 @@ sub is_macro {
   return;
 }
 
-#=head2 bla
-
-#=cut
-  
-sub blaxxx {
-}
 
 
 
@@ -374,6 +351,42 @@ sub Macro {
   bless $referent, "Macro";
 
 }
+
+
+# ----------------------------------------
+#  Debugging Helpers
+# ----------------------------------------
+
+=head1 Debugging Helpers
+
+
+=head2 say
+
+say for backwards-compatibility.
+
+=cut
+
+sub say {
+  local $,="\t";
+  print "@_\n"
+}
+
+=head2 dbout
+
+debug output, controled by global $DEBUG
+
+=cut
+
+sub dbout {
+  return unless $DEBUG;
+  #local $|=1;
+  #  say ("DB:",@_);
+  my @caller=(caller(0))[0..2];
+  Test::More::diag("DB $DEBUG: @_\n") if exists &Test::More::diag;
+}
+
+
+
 
 
 

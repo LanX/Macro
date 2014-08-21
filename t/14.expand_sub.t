@@ -9,7 +9,7 @@ use Test::More;
 use lib '../lib';
 use Macro;
 
-$Macro::DB=0;
+$Macro::DEBUG=1;
 
 Macro::def_macro
   macro => sub
@@ -49,10 +49,15 @@ is( tst(), "Macro 1 2 3", "Unqualified sub expanded into main" );
 
 }
 
+# ------
 Macro::expand_sub('TST::tst2');
-  
-Test::More::is( TST::tst2(), "Macro 1 2 3", "Qualified sub expanded" );
+Test::More::is( TST::tst2(), "Macro 1 2 3", "Fully Qualified sub expanded" );
 
+
+# ------
+my $old_subref = sub { macro(1,2,3) };
+my $new_subref = Macro::expand_sub($old_subref);
+Test::More::is( $new_subref->(), "Macro 1 2 3", "Subref Expanded" );
 
 
 

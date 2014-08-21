@@ -36,23 +36,12 @@ This document describes Macro version 0.0.2
 
 
 
-=head2 dbout
-
-say for backwards-compatibility.
-
-=cut
-
-
-=head2 say
-
-debug output, controled by global $DB
-
-=cut
-
-
 =head2 expand_coderef
 
-Returns deparse_coderef(@args) with activated macros expansion.
+Expands macros in coderef.
+Returns altered source.
+
+Arguments tunneld to deparse_coderef(@_)
 
 =cut
 
@@ -79,6 +68,13 @@ Evals body-code within context of package and closed over
 lexicals.
 
 Returns coderef.
+
+=cut
+
+
+=head1 Macro Management
+
+Handling of Macros
 
 =cut
 
@@ -115,6 +111,23 @@ Otherwise false.
 =head2 Macro
 
 Attribute to mark subs as macros.
+
+=cut
+
+
+=head1 Debugging Helpers
+
+
+=head2 say
+
+say for backwards-compatibility.
+
+=cut
+
+
+=head2 dbout
+
+debug output, controled by global $DEBUG
 
 =cut
 
