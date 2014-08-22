@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION=0.0.3;
+our $VERSION=0.0.4;
 
 # ----------------------------------------
 #  Modulino Testing
@@ -67,11 +67,22 @@ Returns altered source.
 
 Arguments tunneld to deparse_coderef(@_)
 
+* ??? rename?
+-  expand_sub2source
+-  expand_source OBJ
+-  expand_deparse
+   OBJ = coderef/subname
+         sub_body?
+         glob? *func
+- expand2txt sub, exp-level
+- deparse    sub, exp-level
+         
 =cut
 
+  
 
 sub expand_coderef {
-
+        
     #- save original
     $c_pp_entersub_orig	       = \&B::Deparse::pp_entersub;
 
@@ -89,7 +100,7 @@ sub expand_coderef {
 
 =head2 deparse_coderef
 
-Return deparsed code for coderef
+Return deparsed code for coderef w/o expansion
 
 =cut
 
@@ -102,11 +113,17 @@ sub deparse_coderef {
 
 
 
-=head2 expand_sub SUBNAME
+=head2 expand_sub SUB
 
 Replaces body of named sub with expanded code.
 
 Returns new body text.
+
+SUB is either a coderef or a SUBNAME
+
+* ??? rename?
+-  expand sub, exp-level, %opt
+
 
 =cut
 
@@ -171,6 +188,8 @@ lexicals.
 
 Returns coderef.
 
+* ??? rename?
+ - eval_body 
 =cut
 
 sub body2coderef {
