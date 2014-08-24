@@ -107,7 +107,7 @@ Return deparsed code for coderef w/o expansion
 sub deparse_coderef {
   my ($coderef) = @_;
   
-  my $deparse_obj    = B::Deparse->new( "-p", "-q");
+  my $deparse_obj    = B::Deparse->new( "-q","-si8");
   return $deparse_obj->coderef2text( $coderef );
 }
 
