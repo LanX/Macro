@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION="0.0.5-04";
+our $VERSION="0.0.5-05";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -12,12 +12,13 @@ print `prove -b "../t"` unless caller();
 
 use strict;
 use warnings;
-use Carp;
-use Data::Dumper;
 
 use B::Deparse;
-use B::Concise qw(set_style add_callback);
 use PadWalker;
+
+use Attribute::Handlers;
+
+
 
 our $DEBUG=0;						    # global Debug Flag
 
@@ -351,9 +352,29 @@ sub is_macro {
 # ----------------------------------------
 #  Handling Closure Variables
 # ----------------------------------------
+=head1 Handling Closure Variables
 
+Reevaluating deparsed subroutines disconnects closed over
+variables from the original scope.
 
-# Wrappers for PadWalker subs for inspection
+PadWalker is used for retrieving and repairing those variables.
+
+But this dependency to a non-core XS-module is not very fortunate.
+
+The following subs are a direct wrappers to the original
+routines. Like that we facilitate:
+
+  1. A potential future migration to a non-XS solution.
+
+  2. More detailed documentation of manipulating Perl's guts.
+
+=head2 _closed_over
+
+=head2 _set_closed_over
+
+=head2 _peek_sub
+
+=cut
 
 sub _closed_over {
   return PadWalker::closed_over(@_);
@@ -366,12 +387,13 @@ sub _set_closed_over {
 
 
 
+
 # ----------------------------------------
 #  Attributes
 #  http://www.perlmonks.org/index.pl?node_id=1036619
 # ----------------------------------------
 
-use Attribute::Handlers;
+
 
 sub import {
   my $src_pkg=__PACKAGE__;
@@ -403,8 +425,11 @@ sub Macro {
 
 =head1 Debugging Helpers
 
+Little internal helpers for testing, development and debugging.
 
-=head2 say
+(Should maybe be refactored into external module)
+
+=head2 _say
 
 say for backwards-compatibility.
 
@@ -415,7 +440,7 @@ sub say {
   print "@_\n"
 }
 
-=head2 dbout
+=head2 _dbout
 
 debug output, controled by global $DEBUG
 

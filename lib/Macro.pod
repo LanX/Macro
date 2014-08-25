@@ -6,7 +6,7 @@ Macro - Expanding code with LISP like macros
 
 =head1 VERSION
 
-This document describes Macro version 0.0.5-04
+This document describes Macro version 0.0.5-05
 
 
 =head1 SYNOPSIS
@@ -151,6 +151,31 @@ Otherwise false.
 =cut
 
 
+=head1 Handling Closure Variables
+
+Reevaluating deparsed subroutines disconnects closed over
+variables from the original scope.
+
+PadWalker is used for retrieving and repairing those variables.
+
+But this dependency to a non-core XS-module is not very fortunate.
+
+The following subs are a direct wrappers to the original
+routines. Like that we facilitate:
+
+  1. A potential future migration to a non-XS solution.
+
+  2. More detailed documentation of manipulating Perl's guts.
+
+=head2 _closed_over
+
+=head2 _set_closed_over
+
+=head2 _peek_sub
+
+=cut
+
+
 =head2 Macro
 
 Attribute to mark subs as macros.
@@ -160,15 +185,18 @@ Attribute to mark subs as macros.
 
 =head1 Debugging Helpers
 
+Little internal helpers for testing, development and debugging.
 
-=head2 say
+(Should maybe be refactored into external module)
+
+=head2 _say
 
 say for backwards-compatibility.
 
 =cut
 
 
-=head2 dbout
+=head2 _dbout
 
 debug output, controled by global $DEBUG
 

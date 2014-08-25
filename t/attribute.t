@@ -18,7 +18,9 @@ use lib '../lib';
 }
 
 
-diag Macro::is_macro(\&TST::tst);
+#diag Macro::is_macro(\&TST::tst);
+
+is( Macro::is_macro(\&TST::tst),  \&TST::tst , "Attribute marks macro!");
 
 
 done_testing();
