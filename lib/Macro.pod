@@ -6,7 +6,7 @@ Macro - Expanding code with LISP like macros
 
 =head1 VERSION
 
-This document describes Macro version 0.0.5-05
+This document describes Macro version 0.0.5-06
 
 
 =head1 SYNOPSIS
@@ -40,7 +40,7 @@ This document describes Macro version 0.0.5-05
 
 => expanded CODE
 
-Expands macros in deparsed CODEREF
+Expands macros while deparsing CODEREF
 
 
 CAUTION: Only one level expansion implemented yet.
@@ -172,6 +172,26 @@ routines. Like that we facilitate:
 =head2 _set_closed_over
 
 =head2 _peek_sub
+
+=cut
+
+
+=head1 Attribute Handlers
+
+Syntactic sugar to facilitate definition and expansion of macros.
+
+=cut
+
+
+=head2 _import_attributes SRC_PKG, DEST_PKG
+
+We try to avoid global pollution of UNIVERSAL with our handlers.
+
+We use a little hack to install them locally into the importing
+package.
+
+For a more detailed discussion, see L<http://www.perlmonks.org/index.pl?node_id=1036619> 
+  
 
 =cut
 

@@ -1,27 +1,33 @@
 package Macro;
 
-our $VERSION="0.0.5-05";
+our $VERSION="0.0.5-06";
 
 # ----------------------------------------
 #  Modulino Testing
 # ----------------------------------------
 
-#  run tests if called as script
+#  run test suite if module is run directly as script
 print `prove -b "../t"` unless caller();
 #print `cd ..;make test` unless caller();
 
 use strict;
 use warnings;
-
 use B::Deparse;
 use PadWalker;
-
 use Attribute::Handlers;
 
 
 
 our $DEBUG=0;						    # global Debug Flag
 
+# ----------------------------------------
+#  Exports
+# ----------------------------------------
+
+
+sub import {
+  _import_attributes( __PACKAGE__ , (caller)[0] );
+}
 
 # ----------------------------------------
 #  Interface
@@ -65,7 +71,7 @@ our $DEBUG=0;						    # global Debug Flag
 
 => expanded CODE
 
-Expands macros in deparsed CODEREF
+Expands macros while deparsing CODEREF
 
 
 CAUTION: Only one level expansion implemented yet.
@@ -385,23 +391,40 @@ sub _set_closed_over {
   return PadWalker::set_closed_over(@_);
 }
 
-
-
-
 # ----------------------------------------
 #  Attributes
-#  http://www.perlmonks.org/index.pl?node_id=1036619
 # ----------------------------------------
 
+=head1 Attribute Handlers
 
+Syntactic sugar to facilitate definition and expansion of macros.
 
-sub import {
-  my $src_pkg=__PACKAGE__;
-  my $dest_pkg = (caller)[0];
+=cut
   
-  my $import = "sub ${dest_pkg}::Macro : ATTR(CODE) { goto \&${src_pkg}::Macro }";
-  eval $import;
+
+
+=head2 _import_attributes SRC_PKG, DEST_PKG
+
+We try to avoid global pollution of UNIVERSAL with our handlers.
+
+We use a little hack to install them locally into the importing
+package.
+
+For a more detailed discussion, see L<http://www.perlmonks.org/index.pl?node_id=1036619> 
+  
+
+=cut
+
+
+
+sub _import_attributes {
+    my ($src_pkg, $dest_pkg) = @_;
+    
+    my $import = "sub ${dest_pkg}::Macro : ATTR(CODE) { goto \&${src_pkg}::Macro }";
+    eval $import;
+
 }
+
 
 =head2 Macro
 
