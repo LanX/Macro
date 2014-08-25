@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION=0.0.4;
+our $VERSION=0.0.5-1;
 
 # ----------------------------------------
 #  Modulino Testing
@@ -60,7 +60,7 @@ our $DEBUG=0;						    # global Debug Flag
     };
 
 
-=head2 expand_coderef
+=head2 expand2txt
 
 Expands macros in coderef.
 Returns altered source.
@@ -81,7 +81,7 @@ Arguments tunneld to deparse_coderef(@_)
 
   
 
-sub expand_coderef {
+sub expand2txt {
         
     #- save original
     $c_pp_entersub_orig	       = \&B::Deparse::pp_entersub;
@@ -107,7 +107,7 @@ Return deparsed code for coderef w/o expansion
 sub deparse_coderef {
   my ($coderef) = @_;
   
-  my $deparse_obj    = B::Deparse->new( "-q","-si8");
+  my $deparse_obj    = B::Deparse->new( "-q","-p","-si4");
   return $deparse_obj->coderef2text( $coderef );
 }
 
@@ -144,7 +144,7 @@ sub expand_sub {
 
   my $h_closed_over = _closed_over($c_old);
 
-  my $newbody = expand_coderef($c_old);
+  my $newbody = expand2txt($c_old);
 
   # # - wrap pre and post code
   # {

@@ -9,7 +9,7 @@ use Test::More;
 use lib '../lib';
 use Macro;
 
-$Macro::DEBUG=1;
+$Macro::DEBUG=0;
 
 Macro::def_macro
   macro => sub

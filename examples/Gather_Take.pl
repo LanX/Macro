@@ -179,3 +179,249 @@ PRE and POST default to ['_','_']
 =cut
 
 
+=head1  =state= vs =my if 0=
+
+  DB<105> use feature 'state'; my $level=0; sub tst { state $a++; tst() unless $level++ }
+ => 0
+
+  DB<106> peek_sub \&tst
+ => { "\$a" => \undef, "\$level" => \0 }
+
+  DB<107> tst()
+ => 1
+
+  DB<108> peek_sub \&tst
+ => { "\$a" => \2, "\$level" => \2 }
+
+  DB<109> tst()
+ => 2
+
+  DB<110> peek_sub \&tst
+ => { "\$a" => \3, "\$level" => \3 }
+
+  DB<111> my $level=0; sub t2 { my $a if 0; $a++; t2() unless $level++ } => 0
+
+  DB<112> peek_sub \&t2
+ => { "\$a" => \undef, "\$level" => \0 }
+
+  DB<113> t2
+ => 1
+
+  DB<114> peek_sub \&t2
+ => { "\$a" => \1, "\$level" => \2 }
+
+  DB<115> t2()
+ => 2
+
+  DB<116> peek_sub \&t2
+ => { "\$a" => \2, "\$level" => \3 }
+
+  DB<117> use feature 'state'; my $level=0; sub tst { state $a; $a++; tst() unless $level++ }
+ => 0
+
+  DB<118> tst()
+ => 1
+
+  DB<119> peek_sub \&tst 
+ => { "\$a" => \2, "\$level" => \2 }
+
+  DB<120> tst()
+ => 2
+
+  DB<121> peek_sub \&tst 
+ => { "\$a" => \3, "\$level" => \3 }
+
+  DB<122> peek_sub \&t2
+ => { "\$a" => \2, "\$level" => \3 }
+
+  DB<123> use feature 'state'; my $level=0; sub t1 { state $a; $a++; t1() unless $level++>1 ; print "$level:$a\n"}
+ => 0
+
+  DB<124> t1
+3:3
+3:3
+3:3
+ => 1
+
+  DB<125> peek_sub \&t1
+ => { "\$a" => \3, "\$level" => \3 }
+
+  DB<126> use feature 'state'; my $level=0; sub t1 { state $a; $a++;  print "$level:$a\n"; t1() unless $level++>1 ;}
+ => 0
+
+  DB<127> peek_sub \&t1
+ => { "\$a" => \undef, "\$level" => \0 }
+
+  DB<128> t1
+0:1
+1:2
+2:3
+ => 1
+
+  DB<129> use feature 'state'; my $level=0; sub t2 { my $a if 0; $a++;  print "$level:$a\n"; t2() unless $level++>1 ;}
+ => 0
+
+  DB<130> t1
+3:4
+ => 1
+
+  DB<131> peek_sub \&t1
+ => { "\$a" => \4, "\$level" => \4 }
+
+  DB<132> peek_sub \&t2
+ => { "\$a" => \undef, "\$level" => \0 }
+
+  DB<133> t2
+0:1
+1:1
+2:1
+ => 1
+
+  DB<134> use feature 'state'; my $level=0; sub t2 { my $a if 0; $a=$level;  print "$level:$a\n"; t2() unless $level++>1 ;}
+ => 0
+
+  DB<135> t2
+0:0
+1:1
+2:2
+ => 1
+
+  DB<136> peek_sub \&t2
+ => { "\$a" => \0, "\$level" => \3 }
+
+  DB<137> use feature 'state'; my $level=0; sub t1 { state $a; $a=$level;  print "$level:$a\n"; t1() unless $level++>1 ;}
+ => 0
+
+  DB<138> t1
+0:0
+1:1
+2:2
+ => 1
+
+  DB<139> peek_sub \&t1
+ => { "\$a" => \2, "\$level" => \3 }
+
+  DB<140> t1
+3:3
+ => 1
+
+  DB<141> peek_sub \&t1
+ => { "\$a" => \3, "\$level" => \4 }
+
+  DB<142> t2
+3:3
+ => 1
+
+  DB<143> peek_sub \&t2
+ => { "\$a" => \3, "\$level" => \4 }
+
+  DB<144> use feature 'state'; my $level=0; sub t2 { my $a if 0; $a=$level;  print "$level:$a\t"; t2() unless $level++>1 ; print "$level:$a\n"}
+ => 0
+
+  DB<145> t2
+0:0	1:1	2:2	3:2
+3:1
+3:0
+ => 1
+
+  DB<146> use feature 'state'; my $level=0; sub t1 { my $a if 0; $a=$level;  print "$level:$a\t"; t1() unless $level++>1 ; print "$level:$a\n"}
+ => 0
+
+  DB<147> t1
+0:0	1:1	2:2	3:2
+3:1
+3:0
+ => 1
+
+  DB<148> use feature 'state'; my $level=0; sub t1 { state $a; $a=$level;  print "$level:$a\t"; t1() unless $level++>1 ; print "$level:$a\n"}
+ => 0
+
+  DB<149> t1
+0:0	1:1	2:2	3:2
+3:2
+3:2
+ => 1
+
+  DB<150> peek_sub \&t2
+ => { "\$a" => \0, "\$level" => \3 }
+
+  DB<151> peek_sub \&t1
+ => { "\$a" => \2, "\$level" => \3 }
+
+  DB<152> my $tr; $tr =sub { my $x=3; peek_sub $tr }
+ => sub { "???" }
+
+  DB<153> $tr->()
+Undefined subroutine &main:: called at (eval 123)[multi_perl5db.pl:644] line 2.
+
+  DB<154> my $tr; $tr =sub { my $x=3; print $x }
+ => sub { "???" }
+
+  DB<155> $tr->()
+Undefined subroutine &main:: called at (eval 127)[multi_perl5db.pl:644] line 2.
+
+  DB<156> my $tr; $tr =sub { my $x=3; peek_sub $tr }; $tr->()
+ => { "\$tr" => \sub { "???" }, "\$x" => \3 }
+
+  DB<157> my $tr; $tr =sub { my $x=3; { my $x=42; peek_sub $tr} }; $tr->()
+ => { "\$tr" => \sub { "???" }, "\$x" => \42 }
+
+  DB<158> use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr} }; $tr->()
+Undefined subroutine &main:: called at (eval 133)[multi_perl5db.pl:644] line 2.
+
+  DB<159> use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr2} }; $tr->()
+Undefined subroutine &main:: called at (eval 135)[multi_perl5db.pl:644] line 2.
+
+  DB<160> use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr2} }; $tr2->()
+ => { "\$tr2" => \sub { "???" }, "\$x" => \42 }
+
+  DB<161> use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr2} ; $x}; $tr2->()
+ => 3
+
+    161: use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr2} ; $x}; $tr2->()
+    160: use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr2} }; $tr2->()
+    159: use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr2} }; $tr->()
+    158: use feature 'state'; my $tr2; $tr2 =sub { state $x=3; { state $x=42; peek_sub $tr} }; $tr->()
+    157: my $tr; $tr =sub { my $x=3; { my $x=42; peek_sub $tr} }; $tr->()
+    156: my $tr; $tr =sub { my $x=3; peek_sub $tr }; $tr->()
+    155: $tr->()
+    154: my $tr; $tr =sub { my $x=3; print $x }
+    153: $tr->()
+    152: my $tr; $tr =sub { my $x=3; peek_sub $tr }
+    151: peek_sub \&t1
+    150: peek_sub \&t2
+    149: t1
+    148: use feature 'state'; my $level=0; sub t1 { state $a; $a=$level;  print "$level:$a\t"; t1() unless $level++>1 ; print "$level:$a\n"}
+    147: t1
+    146: use feature 'state'; my $level=0; sub t1 { my $a if 0; $a=$level;  print "$level:$a\t"; t1() unless $level++>1 ; print "$level:$a\n"}
+    145: t2
+    144: use feature 'state'; my $level=0; sub t2 { my $a if 0; $a=$level;  print "$level:$a\t"; t2() unless $level++>1 ; print "$level:$a\n"}
+    143: peek_sub \&t2
+    142: t2
+    141: peek_sub \&t1
+    140: t1
+    139: peek_sub \&t1
+    138: t1
+    137: use feature 'state'; my $level=0; sub t1 { state $a; $a=$level;  print "$level:$a\n"; t1() unless $level++>1 ;}
+    136: peek_sub \&t2
+    135: t2
+    134: use feature 'state'; my $level=0; sub t2 { my $a if 0; $a=$level;  print "$level:$a\n"; t2() unless $level++>1 ;}
+    133: t2
+    132: peek_sub \&t2
+    131: peek_sub \&t1
+    130: t1
+    129: use feature 'state'; my $level=0; sub t2 { my $a if 0; $a++;  print "$level:$a\n"; t2() unless $level++>1 ;}
+    128: t1
+    127: peek_sub \&t1
+    126: use feature 'state'; my $level=0; sub t1 { state $a; $a++;  print "$level:$a\n"; t1() unless $level++>1 ;}
+    125: peek_sub \&t1
+    124: t1
+    123: use feature 'state'; my $level=0; sub t1 { state $a; $a++; t1() unless $level++>1 ; print "$level:$a\n"}
+    122: peek_sub \&t2
+    121: peek_sub \&tst 
+    120: tst()
+    119: peek_sub \&tst 
+    118: tst()
+    117: use feature 'state'; my $level=0; sub tst { state $a; $a++; tst() unless $level++ }
+
+=cut

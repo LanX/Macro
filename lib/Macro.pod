@@ -36,7 +36,7 @@ This document describes Macro version 0.0.2
 
 
 
-=head2 expand_coderef
+=head2 expand2txt
 
 Expands macros in coderef.
 Returns altered source.
