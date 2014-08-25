@@ -24,7 +24,7 @@ my $c_sub;
 
 
 
-is( Macro::deparse_coderef($c_sub),  $body, "Deparse works");
+is( Macro::deparse2text($c_sub),  $body, "Deparse works");
 
 done_testing();
 

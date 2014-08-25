@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION="0.0.5-03";
+our $VERSION="0.0.5-04";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -69,9 +69,9 @@ Expands macros in deparsed CODEREF
 
 CAUTION: Only one level expansion implemented yet.
 
-Arguments tunneld to deparse_coderef(@_)
+Arguments tunneld to deparse2text(@_)
 
-=for TODOX
+=for TODO
  ** ??? rename?
   -  expand_sub2source
   -  expand_source OBJ
@@ -96,14 +96,14 @@ sub expand2text {
     local *B::Deparse::pp_entersub = $c_pp_entersub_wrapper;
 
     # - return deparsed text
-    return deparse_coderef(@_)
+    return deparse2text(@_)
   }
 
 }
 
 
 
-=head2 deparse_coderef
+=head2 deparse2text
 
 => deparsed CODE
 
@@ -111,7 +111,7 @@ Return deparsed code for coderef w/o expansion
 
 =cut
 
-sub deparse_coderef {
+sub deparse2text {
   my ($coderef) = @_;
   
   my $deparse_obj    = B::Deparse->new( "-q","-p","-si4");
