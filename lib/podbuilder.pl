@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+							    
 use strict;
 use warnings;
 
@@ -5,8 +7,9 @@ my $modulename="Macro";
 chdir '/home/lanx/perl/talks/ExtendingSyntax/modules/Macro/lib/';
 
 
-
 my $api_pod;
+my $version;
+
 sub grab (_;@)  {
   $api_pod .= "@_";
 }
@@ -19,7 +22,14 @@ open my $module, "<", "$modulename.pm"
   or die "'$modulename.pm' $!";
 
 while  (<$module>) {
-  if ( /^=head[12]/ .. /^=cut/ ) {
+    if ( / our \s* \$VERSION \s* = \s* (['"]?)([-0-9.]+)\1 \s*; /x ) {
+	warn "too many versionstrings" if $version;
+	$version =$2;
+    }
+    
+      
+
+  if ( /^=head[123]/ .. /^=cut/ ) {
     grab;
   }
 
@@ -33,8 +43,7 @@ while  (<$module>) {
 close $module;
 
 my %insert;
-
-$insert{VERSION}= '0.0.2';
+$insert{VERSION}= $version;
 $insert{API_POD}= $api_pod;
 
 

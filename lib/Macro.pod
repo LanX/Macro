@@ -6,7 +6,7 @@ Macro - Expanding code with LISP like macros
 
 =head1 VERSION
 
-This document describes Macro version 0.0.2
+This document describes Macro version 0.0.5-03
 
 
 =head1 SYNOPSIS
@@ -36,41 +36,66 @@ This document describes Macro version 0.0.2
 
 
 
-=head2 expand2txt
+=head2 expand2text CODEREF  
 
-Expands macros in coderef.
-Returns altered source.
+=> expanded CODE
+
+Expands macros in deparsed CODEREF
+
+
+CAUTION: Only one level expansion implemented yet.
 
 Arguments tunneld to deparse_coderef(@_)
 
-* ??? rename?
--  expand_sub2source
--  expand_source OBJ
--  expand_deparse
+=for TODOX
+ ** ??? rename?
+  -  expand_sub2source
+  -  expand_source OBJ
+  -  expand_deparse
    OBJ = coderef/subname
          sub_body?
          glob? *func
-- expand2txt sub, exp-level
-- deparse    sub, exp-level
-         
+  - expand2txt sub, exp-level
+  - deparse    sub, exp-level
+        
 =cut
 
 
 =head2 deparse_coderef
+
+=> deparsed CODE
 
 Return deparsed code for coderef w/o expansion
 
 =cut
 
 
-=head2 expand_sub SUB
+=head2 expand SUB
 
-Replaces body of named sub with expanded code.
+=> new CODEREF
 
-Returns new body text.
+Evals text expansion of SUB = [CODEREF|SUBNAME]
 
-SUB is either a coderef or a SUBNAME
+=head3 expand SUBNAME
 
+Side effect: Installs new CODEREF into SUBNAME's package.
+
+(pass coderef =\&SUBNAME= otherwise)
+
+SUBNAME is a string like "Package::func" or "func".
+
+If not fully qualified current package of caller is chosen
+
+=head3 expand CODEREF
+
+No side effect!
+
+
+
+
+=for TODO
+* Glob passing?
+ - is package known?
 * ??? rename?
 -  expand sub, exp-level, %opt
 
@@ -197,7 +222,14 @@ Macro requires no configuration files or environment variables.
     the module is part of the standard Perl distribution, part of the
     module's distribution, or must be installed separately. ]
 
-None.
+
+=head2 C<B::Deparse>
+Belongs to core distribution since 5.05 (?)
+
+=head2 C<PadWalker>.
+Needed to handle closed over variables.
+
+In other cases not needed, might become non obligatory in the future.  
 
 
 =head1 INCOMPATIBILITIES
@@ -223,7 +255,10 @@ None reported.
     limitations on the size of data sets, special cases that are not
     (yet) handled, etc.
 
-No bugs have been reported.
+=head2 Expansion level
+
+Nested macros are not yet handled, expansion stops after one level. 
+This will be addressed in future versions. 
 
 Please report any bugs or feature requests to
 C<bug-Macro@rt.cpan.org>, or through the web interface at

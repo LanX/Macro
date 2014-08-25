@@ -22,7 +22,7 @@ sub tst {
 }
 
 
-Macro::expand_sub('main::tst');
+Macro::expand('main::tst');
 
 is( tst(), "Macro 1 2 3", "Unqualified sub expanded into main" );
 
@@ -43,20 +43,20 @@ is( tst(), "Macro 1 2 3", "Unqualified sub expanded into main" );
     macro(1,2,3)
   }
 
-  Macro::expand_sub('tst');
+  Macro::expand('tst');
   
   Test::More::is( tst(), "Macro 1 2 3", "Unqualified sub expanded into callers package " );
 
 }
 
 # ------
-Macro::expand_sub('TST::tst2');
+Macro::expand('TST::tst2');
 Test::More::is( TST::tst2(), "Macro 1 2 3", "Fully Qualified sub expanded" );
 
 
 # ------
 my $old_subref = sub { macro(1,2,3) };
-my $new_subref = Macro::expand_sub($old_subref);
+my $new_subref = Macro::expand($old_subref);
 Test::More::is( $new_subref->(), "Macro 1 2 3", "Subref Expanded" );
 
 

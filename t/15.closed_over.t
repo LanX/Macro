@@ -44,7 +44,7 @@ is( enclosed(),
     "Sub unexpanded");
 
 # expand enclosed()
-Macro::expand_sub("enclosed");
+Macro::expand("enclosed");
 
 is_deeply ( enclosed() ,
 	    { '$a $b $c' => ['A', 'B', 'C'] },

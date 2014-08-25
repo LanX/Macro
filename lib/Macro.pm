@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION=0.0.5-1;
+our $VERSION="0.0.5-03";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -60,28 +60,33 @@ our $DEBUG=0;						    # global Debug Flag
     };
 
 
-=head2 expand2txt
+=head2 expand2text CODEREF  
 
-Expands macros in coderef.
-Returns altered source.
+=> expanded CODE
+
+Expands macros in deparsed CODEREF
+
+
+CAUTION: Only one level expansion implemented yet.
 
 Arguments tunneld to deparse_coderef(@_)
 
-* ??? rename?
--  expand_sub2source
--  expand_source OBJ
--  expand_deparse
+=for TODOX
+ ** ??? rename?
+  -  expand_sub2source
+  -  expand_source OBJ
+  -  expand_deparse
    OBJ = coderef/subname
          sub_body?
          glob? *func
-- expand2txt sub, exp-level
-- deparse    sub, exp-level
-         
+  - expand2txt sub, exp-level
+  - deparse    sub, exp-level
+        
 =cut
 
   
 
-sub expand2txt {
+sub expand2text {
         
     #- save original
     $c_pp_entersub_orig	       = \&B::Deparse::pp_entersub;
@@ -100,6 +105,8 @@ sub expand2txt {
 
 =head2 deparse_coderef
 
+=> deparsed CODE
+
 Return deparsed code for coderef w/o expansion
 
 =cut
@@ -113,21 +120,39 @@ sub deparse_coderef {
 
 
 
-=head2 expand_sub SUB
+=head2 expand SUB
 
-Replaces body of named sub with expanded code.
+=> new CODEREF
 
-Returns new body text.
+Evals text expansion of SUB = [CODEREF|SUBNAME]
 
-SUB is either a coderef or a SUBNAME
+=head3 expand SUBNAME
 
+Side effect: Installs new CODEREF into SUBNAME's package.
+
+(pass coderef =\&SUBNAME= otherwise)
+
+SUBNAME is a string like "Package::func" or "func".
+
+If not fully qualified current package of caller is chosen
+
+=head3 expand CODEREF
+
+No side effect!
+
+
+
+
+=for TODO
+* Glob passing?
+ - is package known?
 * ??? rename?
 -  expand sub, exp-level, %opt
 
 
 =cut
 
-sub expand_sub {
+sub expand {
   my ($sub,%opt) = @_;
 
   #local $DEBUG=1;
@@ -144,7 +169,7 @@ sub expand_sub {
 
   my $h_closed_over = _closed_over($c_old);
 
-  my $newbody = expand2txt($c_old);
+  my $newbody = expand2text($c_old);
 
   # # - wrap pre and post code
   # {

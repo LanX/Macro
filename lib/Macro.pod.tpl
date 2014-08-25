@@ -83,7 +83,14 @@ Macro requires no configuration files or environment variables.
     the module is part of the standard Perl distribution, part of the
     module's distribution, or must be installed separately. ]
 
-None.
+
+=head2 C<B::Deparse>
+Belongs to core distribution since 5.05 (?)
+
+=head2 C<PadWalker>.
+Needed to handle closed over variables.
+
+In other cases not needed, might become non obligatory in the future.  
 
 
 =head1 INCOMPATIBILITIES
@@ -109,7 +116,10 @@ None reported.
     limitations on the size of data sets, special cases that are not
     (yet) handled, etc.
 
-No bugs have been reported.
+=head2 Expansion level
+
+Nested macros are not yet handled, expansion stops after one level. 
+This will be addressed in future versions. 
 
 Please report any bugs or feature requests to
 C<bug-Macro@rt.cpan.org>, or through the web interface at
