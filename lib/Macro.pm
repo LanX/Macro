@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION="0.0.5-06";
+our $VERSION="0.0.5-07";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -35,36 +35,36 @@ sub import {
 
 
 {
-  my $c_pp_entersub_orig;
+    my $c_pp_entersub_orig;
 
 
-  my $c_pp_entersub_wrapper = sub
-    {
-      my ($self, $op, $cx ) = @_;
+    my $c_pp_entersub_wrapper = sub
+      {
+	  my ($self, $op, $cx ) = @_;
   
-      #- original text of sub-call
-      my $entersub_text = $c_pp_entersub_orig->(@_);
-      dbout( "entersub_text: $entersub_text" );
+	  #- original text of sub-call
+	  my $entersub_text = $c_pp_entersub_orig->(@_);
+	  dbout( "entersub_text: $entersub_text" );
 
-      #- decompose call_text 
-      my ( $fullname, $args ) = ( $entersub_text =~ m/ ([:\w]+) \( (.*) \) /x );
-      dbout( "name: $fullname, args: $args" );
+	  #- decompose call_text 
+	  my ( $fullname, $args ) = ( $entersub_text =~ m/ ([:\w]+) \( (.*) \) /x );
+	  dbout( "name: $fullname, args: $args" );
 
-      my $current_package = $self->{'curstash'};
-      dbout( "$current_package" );
+	  my $current_package = $self->{'curstash'};
+	  dbout( "$current_package" );
 
-      my $c_macro = ref_macro ( $fullname, $current_package );
+	  my $c_macro = ref_macro ( $fullname, $current_package );
 
-      #- ignore normal subs
-      return $entersub_text unless $c_macro; 
+	  #- ignore normal subs
+	  return $entersub_text unless $c_macro; 
       
-      #- split args to strings
-      my @args = split /, /, $args;	     # a bit dirty
-      # TODO: analyze "$self->deparse($_, 6), @exprs)"
+	  #- split args to strings
+	  my @args = split /, /, $args;			 # a bit dirty
+	  # TODO: analyze "$self->deparse($_, 6), @exprs)"
 
-      # return macro expansion text
-      return $c_macro->(@args);
-    };
+	  # return macro expansion text
+	  return $c_macro->(@args);
+      };
 
 
 =head2 expand2text CODEREF  
@@ -104,7 +104,10 @@ sub expand2text {
 
     # - return deparsed text
     return deparse2text(@_)
-  }
+}
+
+
+
 
 }
 
@@ -265,11 +268,59 @@ __ERR__
 
 =head1 Macro Management
 
-Handling of Macros
+Macros are just ordenary subroutines and follow the same call-syntax.
+
+But at expansion time they need to be distiguished from non-macros.
+
+The following routines are an abstraction layer to facilitate
+experimenting different approaches.
+
+Currently we just bless their coderef into package "Macro".
+
+(This is likely to change in the future, never rely on this)
+
+NB: Exported macros keep being macros.
 
 =cut
 
-=head2 ref_macro NAME, CURRENT_PACKAGE
+
+=head2 mark_macro CODEREF
+
+=> blessed CODEREF
+
+Marks coderef as macro.
+
+=cut
+
+my $MACROCLASS="Macro";
+
+sub mark_macro {
+  my ($coderef) = @_;
+
+  bless $coderef, $MACROCLASS;
+}
+
+
+=head2 is_macro CODEREF
+
+Is true (returns CODEREF) if pointing to a macro.
+
+Otherwise false.
+
+=cut
+
+
+sub is_macro {
+  my ($coderef) = @_;
+
+  return $coderef
+    if ref $coderef eq $MACROCLASS;
+  return;
+}
+
+
+
+=head2 ref_macro SUBNAME, CURRENT_PACKAGE
 
 Return reference of named macro.
 
@@ -283,12 +334,6 @@ $current_package is ignored if $name is fully quallified
 sub ref_macro {
   my ( $name, $current_package ) =@_;
 
-  # #- fully qualified subname
-  # my $fullname = $name;
-  # if ( $name !~ /::/ ) {
-  #   $fullname = $current_package . "::" . $name;
-  # }
-
   my $fullname = _fullname( $name, $current_package );
   
   my $coderef = \&{$fullname};
@@ -296,6 +341,14 @@ sub ref_macro {
   return is_macro($coderef);
 
 }
+
+=head2 _fullname SUBNAME, PCKG
+
+=> full SUBNAME
+
+Returns "PCKG::NAME" if NAME not already fully qualified
+
+=cut
 
 
 sub _fullname {
@@ -328,29 +381,13 @@ sub def_macro {
   
   my $fullname = _fullname( $name, $pkg);
   
-  bless $block, "Macro";
+  mark_macro($block);
  
   *{$fullname} = $block;
 } 
 
 
 
-=head2 is_macro CODEREF
-
-Is true (returns CODEREF) if pointing to a macro.
-
-Otherwise false.
-
-=cut
-
-
-sub is_macro {
-  my ($coderef) = @_;
-
-  return $coderef
-    if ref $coderef eq "Macro";
-  return;
-}
 
 
 
@@ -376,9 +413,12 @@ routines. Like that we facilitate:
 
 =head2 _closed_over
 
+
 =head2 _set_closed_over
 
+
 =head2 _peek_sub
+
 
 =cut
 
@@ -430,14 +470,16 @@ sub _import_attributes {
 
 Attribute to mark subs as macros.
 
+  sub bla :Macro { ... }
+
+For details see mark_macro().
 =cut
 
 sub Macro {
   my ( $package, $symbol, $referent, $attr, $data, $phase, $filename,
       $linenum ) = @_;
-#  dd \@_;
 
-  bless $referent, "Macro";
+  mark_macro($referent);
 
 }
 
@@ -452,7 +494,7 @@ Little internal helpers for testing, development and debugging.
 
 (Should maybe be refactored into external module)
 
-=head2 _say
+=head2 say
 
 say for backwards-compatibility.
 
@@ -463,7 +505,7 @@ sub say {
   print "@_\n"
 }
 
-=head2 _dbout
+=head2 dbout
 
 debug output, controled by global $DEBUG
 

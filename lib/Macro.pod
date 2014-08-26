@@ -6,7 +6,7 @@ Macro - Expanding code with LISP like macros
 
 =head1 VERSION
 
-This document describes Macro version 0.0.5-06
+This document describes Macro version 0.0.5-07
 
 
 =head1 SYNOPSIS
@@ -117,12 +117,41 @@ Returns coderef.
 
 =head1 Macro Management
 
-Handling of Macros
+Macros are just ordenary subroutines and follow the same call-syntax.
+
+But at expansion time they need to be distiguished from non-macros.
+
+The following routines are an abstraction layer to facilitate
+experimenting different approaches.
+
+Currently we just bless their coderef into package "Macro".
+
+(This is likely to change in the future, never rely on this)
+
+NB: Exported macros keep being macros.
 
 =cut
 
 
-=head2 ref_macro NAME, CURRENT_PACKAGE
+=head2 mark_macro CODEREF
+
+=> blessed CODEREF
+
+Marks coderef as macro.
+
+=cut
+
+
+=head2 is_macro CODEREF
+
+Is true (returns CODEREF) if pointing to a macro.
+
+Otherwise false.
+
+=cut
+
+
+=head2 ref_macro SUBNAME, CURRENT_PACKAGE
 
 Return reference of named macro.
 
@@ -133,20 +162,20 @@ $current_package is ignored if $name is fully quallified
 =cut
 
 
+=head2 _fullname SUBNAME, PCKG
+
+=> full SUBNAME
+
+Returns "PCKG::NAME" if NAME not already fully qualified
+
+=cut
+
+
 =head2 def_macro NAME, BLOCK
 
 Installs C<sub NAME {BLOCK}> and marks it as macro.
 
 NAME defaults to local package if unqualified.
-
-=cut
-
-
-=head2 is_macro CODEREF
-
-Is true (returns CODEREF) if pointing to a macro.
-
-Otherwise false.
 
 =cut
 
@@ -169,9 +198,12 @@ routines. Like that we facilitate:
 
 =head2 _closed_over
 
+
 =head2 _set_closed_over
 
+
 =head2 _peek_sub
+
 
 =cut
 
@@ -200,6 +232,9 @@ For a more detailed discussion, see L<http://www.perlmonks.org/index.pl?node_id=
 
 Attribute to mark subs as macros.
 
+  sub bla :Macro { ... }
+
+For details see mark_macro().
 =cut
 
 
@@ -209,14 +244,14 @@ Little internal helpers for testing, development and debugging.
 
 (Should maybe be refactored into external module)
 
-=head2 _say
+=head2 say
 
 say for backwards-compatibility.
 
 =cut
 
 
-=head2 _dbout
+=head2 dbout
 
 debug output, controled by global $DEBUG
 
