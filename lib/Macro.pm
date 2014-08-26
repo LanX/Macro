@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION="0.0.5-07";
+our $VERSION="0.0.6-00";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -50,6 +50,7 @@ sub import {
 	  my ( $fullname, $args ) = ( $entersub_text =~ m/ ([:\w]+) \( (.*) \) /x );
 	  dbout( "name: $fullname, args: $args" );
 
+	  #- subname may not be fully quallyfied
 	  my $current_package = $self->{'curstash'};
 	  dbout( "$current_package" );
 
@@ -388,9 +389,56 @@ sub def_macro {
 
 
 
+# ============================================================
+
+=head1 Hygienic Macros
+
+http://en.wikipedia.org/wiki/Hygienic_macro#Strategies_used_in_languages_that_lack_hygienic_macros
+
+Hygienic transformation
+
+=cut
+
+{
+    my %protect;
+    
+    sub protect_symbols {
+	%protect=@_;
+    }
+    
+
+    sub rename_symbols {
+	my ($tmpl,$c_oldsub)=@_;
+
+	my %peek = _peek_sub($c_oldsub);
+	my %transform;
+	
+	while ( my ($sigil,$a_symbol) = each %protect) {
+	    for my $symbol (@$a_symbol) {
+		my $suffix = "A";
+		my $old = my $new = $sigil.$symbol;
+		while ( exists $peek{$new} ) {
+		    $new = $old . $suffix++;
+		}
+		$transform{$old}=$new
+		  if $old ne $new;	
+	    }  
+	} 
+
+	if (%transform) {
+	    my $or_regex = join "|",
+	      map {quotemeta} keys %transform;
+
+	    $tmpl =~ s/($or_regex)/$transform{$1}/g;
+	}
+	return $tmpl; 
+    }
+    
+
+}
 
 
-
+  
 
 # ----------------------------------------
 #  Handling Closure Variables
@@ -450,8 +498,10 @@ We try to avoid global pollution of UNIVERSAL with our handlers.
 We use a little hack to install them locally into the importing
 package.
 
-For a more detailed discussion, see L<http://www.perlmonks.org/index.pl?node_id=1036619> 
-  
+For a more detailed discussion, see
+  L<http://www.perlmonks.org/index.pl?node_id=1036619>
+
+Future: Might be refactored into separate module.
 
 =cut
 

@@ -6,7 +6,7 @@ Macro - Expanding code with LISP like macros
 
 =head1 VERSION
 
-This document describes Macro version 0.0.5-07
+This document describes Macro version 0.0.6-00
 
 
 =head1 SYNOPSIS
@@ -180,6 +180,15 @@ NAME defaults to local package if unqualified.
 =cut
 
 
+=head1 Hygienic Macros
+
+http://en.wikipedia.org/wiki/Hygienic_macro#Strategies_used_in_languages_that_lack_hygienic_macros
+
+Hygienic transformation
+
+=cut
+
+
 =head1 Handling Closure Variables
 
 Reevaluating deparsed subroutines disconnects closed over
@@ -222,8 +231,10 @@ We try to avoid global pollution of UNIVERSAL with our handlers.
 We use a little hack to install them locally into the importing
 package.
 
-For a more detailed discussion, see L<http://www.perlmonks.org/index.pl?node_id=1036619> 
-  
+For a more detailed discussion, see
+  L<http://www.perlmonks.org/index.pl?node_id=1036619>
+
+Future: Might be refactored into separate module.
 
 =cut
 
@@ -307,12 +318,18 @@ Macro requires no configuration files or environment variables.
 
 
 =head2 C<B::Deparse>
+
 Belongs to core distribution since 5.05 (?)
 
-=head2 C<PadWalker>.
-Needed to handle closed over variables.
+=head2 C<Attribute::Handlers>
 
-In other cases not needed, might become non obligatory in the future.  
+Belongs to core distribution since ???.
+
+=head2 C<PadWalker>.
+
+Needed to handle variables closed over expanded subs. 
+
+In other cases not needed, might become optional.  
 
 
 =head1 INCOMPATIBILITIES

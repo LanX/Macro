@@ -85,12 +85,18 @@ Macro requires no configuration files or environment variables.
 
 
 =head2 C<B::Deparse>
+
 Belongs to core distribution since 5.05 (?)
 
-=head2 C<PadWalker>.
-Needed to handle closed over variables.
+=head2 C<Attribute::Handlers>
 
-In other cases not needed, might become non obligatory in the future.  
+Belongs to core distribution since ???.
+
+=head2 C<PadWalker>.
+
+Needed to handle variables closed over expanded subs. 
+
+In other cases not needed, might become optional.  
 
 
 =head1 INCOMPATIBILITIES
