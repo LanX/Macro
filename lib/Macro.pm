@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION="0.0.6-00";
+our $VERSION="0.0.6-01";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -488,13 +488,13 @@ We recommend using upercase letters surounded by one underscore.
 	    }  
 	} 
 
-	# symbols can't be surounded by valid identifier characters
+	# symbols can't be surounded by other identifier characters
 	my $re_identifier = qr/[0-9a-zA-Z_]/; 		     
 	
 	if (%transform) {
 	    my $or_regex =
 	      join "|", 				    # regex or
-		map {quotemeta}
+		map {quotemeta}				    # escape
 		  sort { length($b) <=> length($a) }	    # substring last
 		    keys %transform;
 
