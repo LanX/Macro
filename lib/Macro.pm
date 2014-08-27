@@ -393,9 +393,55 @@ sub def_macro {
 
 =head1 Hygienic Macros
 
-http://en.wikipedia.org/wiki/Hygienic_macro#Strategies_used_in_languages_that_lack_hygienic_macros
+The full expansion (Macros and Template) should under no cases
+introduce new symbols conflicting with symbols within the scope of the
+old sub to be expanded.
 
-Hygienic transformation
+Symbols := lexical Variables, Labels and other identifiers
+
+Various techniques are know in languages like LISP, such as
+- Obfuscation,
+- GenSym,
+- using reserved namespaces,
+- Convention: prepending full module-name to symbol
+
+For details sie [wp://Macro Hygiene] http://en.wikipedia.org/wiki/Hygienic_macro#Strategies_used_in_languages_that_lack_hygienic_macros
+ in WP.
+
+    my OLD_closed_over;
+    {
+	my NEW_closed_over;
+
+	sub NEW_SUB {
+	    PreTEMPLATE;
+	    OLD_BODY {
+		# ... ;
+		MACRO();
+		# ... ;
+	    };
+	    PostTEMPLATE;
+	}
+    }
+
+
+Since the code of OLD_SUB is unknown to the macro-author, symbol-names
+need to be indentified at expansion time to resolve the conflict.
+
+This is done by altering the new symbol names with extra characters.
+
+This is done by replacing a placeholder for each symbol indentifier in
+the Source-Templates of Super-Macro and Macros _before_ introducing new code.
+
+This is done by a simple global substitution =s///g= of source_templates pre eval, hence
+PLACEHOLDERS MUST be chosen to be unique.
+
+I.e. no substring in other parts of the template (like parts of a
+subname) should be placeholder, this module doesn't attempt to parse Perl syntax.
+
+Placeholders should be valid identifiers and well chosen to facilitate
+later debugging.
+
+We recommend using upercase letters surounded by one underscore. 
 
 =cut
 
@@ -403,35 +449,63 @@ Hygienic transformation
     my %protect;
     
     sub protect_symbols {
-	%protect=@_;
+	my %args = @_;
+	%protect = (
+	    PRE  => ['_','_'], # defaults
+	    POST => ['_','_'],
+	    %args,	       # new
+	   );
+	#use Data::Dump;
+	#dd \%protect;
     }
     
 
     sub rename_symbols {
 	my ($tmpl,$c_oldsub)=@_;
 
-	my %peek = _peek_sub($c_oldsub);
+	my $peek = _peek_sub($c_oldsub);
 	my %transform;
+
+	my ($pre_old,$pre_new)   = @{$protect{PRE}};
+	my ($post_old,$post_new) = @{$protect{POST}};
+	
 	
 	while ( my ($sigil,$a_symbol) = each %protect) {
+	    next unless $sigil =~ /[@%\$]/;
+	    
 	    for my $symbol (@$a_symbol) {
-		my $suffix = "A";
-		my $old = my $new = $sigil.$symbol;
-		while ( exists $peek{$new} ) {
-		    $new = $old . $suffix++;
+		say ($sigil,$symbol);
+
+		my $suffix = "a";
+		my $old  = $pre_old . $symbol . $post_old;
+		my $new  = $pre_new . $symbol . $post_new;
+		my $new0 = $new;
+		while ( exists $peek->{$sigil.$new} ) {
+		    $new = $new0 . $suffix++ . $post_new;
 		}
-		$transform{$old}=$new
+		$transform{$old} = $new
 		  if $old ne $new;	
 	    }  
 	} 
 
+	# symbols can't be surounded by valid identifier characters
+	my $re_identifier = qr/[0-9a-zA-Z_]/; 		     
+	
 	if (%transform) {
-	    my $or_regex = join "|",
-	      map {quotemeta} keys %transform;
+	    my $or_regex =
+	      join "|", 				    # regex or
+		map {quotemeta}
+		  sort { length($b) <=> length($a) }	    # substring last
+		    keys %transform;
 
-	    $tmpl =~ s/($or_regex)/$transform{$1}/g;
+	    $tmpl =~ s/   (?<! $re_identifier )  # not preceding
+			  (
+			      $or_regex
+			  )
+			  (?!  $re_identifier )  # not following 
+		      /$transform{$1}/xg;
 	}
-	return $tmpl; 
+	return $tmpl,\%transform; 
     }
     
 
@@ -477,6 +551,10 @@ sub _closed_over {
 
 sub _set_closed_over {
   return PadWalker::set_closed_over(@_);
+}
+
+sub _peek_sub {
+  return PadWalker::peek_sub(@_);
 }
 
 # ----------------------------------------

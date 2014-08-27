@@ -182,9 +182,55 @@ NAME defaults to local package if unqualified.
 
 =head1 Hygienic Macros
 
-http://en.wikipedia.org/wiki/Hygienic_macro#Strategies_used_in_languages_that_lack_hygienic_macros
+The full expansion (Macros and Template) should under no cases
+introduce new symbols conflicting with symbols within the scope of the
+old sub to be expanded.
 
-Hygienic transformation
+Symbols := lexical Variables, Labels and other identifiers
+
+Various techniques are know in languages like LISP, such as
+- Obfuscation,
+- GenSym,
+- using reserved namespaces,
+- Convention: prepending full module-name to symbol
+
+For details sie [wp://Macro Hygiene] http://en.wikipedia.org/wiki/Hygienic_macro#Strategies_used_in_languages_that_lack_hygienic_macros
+ in WP.
+
+    my OLD_closed_over;
+    {
+	my NEW_closed_over;
+
+	sub NEW_SUB {
+	    PreTEMPLATE;
+	    OLD_BODY {
+		# ... ;
+		MACRO();
+		# ... ;
+	    };
+	    PostTEMPLATE;
+	}
+    }
+
+
+Since the code of OLD_SUB is unknown to the macro-author, symbol-names
+need to be indentified at expansion time to resolve the conflict.
+
+This is done by altering the new symbol names with extra characters.
+
+This is done by replacing a placeholder for each symbol indentifier in
+the Source-Templates of Super-Macro and Macros _before_ introducing new code.
+
+This is done by a simple global substitution =s///g= of source_templates pre eval, hence
+PLACEHOLDERS MUST be chosen to be unique.
+
+I.e. no substring in other parts of the template (like parts of a
+subname) should be placeholder, this module doesn't attempt to parse Perl syntax.
+
+Placeholders should be valid identifiers and well chosen to facilitate
+later debugging.
+
+We recommend using upercase letters surounded by one underscore. 
 
 =cut
 
