@@ -14,14 +14,14 @@ Macro::protect_symbols(
 	':'  => [qw/ LABLE /],
        );
 
-my $tmpl = <<"__TMPL__";
-   print 'Must change: \$<SCALAR42>, \%<HASH666>, \@<ARRAY123>, \$<SUPER> ',
-__TMPL__
+my $tmpl = '$<SCALAR42>, %<HASH666>, @<ARRAY123>, $<SUPER>';
 
-my $SUPER=5;
+
+
+my $_SUPER_=5;
 
 my $c_old_sub = sub {
-    my $_SCALAR42_a_ = $SUPER;
+    my $_SCALAR42_a_ = $_SUPER_;
     my $_SCALAR42_  ;
     my $SCALAR42  ;
     my %_HASH666_  =();
@@ -29,13 +29,20 @@ my $c_old_sub = sub {
 };
 
 use Data::Dump;
-dd Macro::_peek_sub($c_old_sub);
+# dd Macro::_peek_sub($c_old_sub);
 
 
 dd Macro::rename_symbols($tmpl,$c_old_sub);      
 
+is (
+    Macro::rename_symbols($tmpl,$c_old_sub),
+    "\$_SCALAR42_b_, %_HASH666_a_, \@_ARRAY123_a_, \$_SUPER_a_",
+    "Symbol protection!"
+   );
+
 done_testing();
-exit;
+
+__END__
 
 # --------------------
 

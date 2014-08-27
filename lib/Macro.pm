@@ -474,7 +474,7 @@ We recommend using upercase letters surounded by one underscore.
 	    next unless $sigil =~ /[@%\$]/;
 	    
 	    for my $symbol (@$a_symbol) {
-		say ($sigil,$symbol);
+		dbout ($sigil,$symbol);
 
 		my $suffix = "a";
 		my $old  = $pre_old . $symbol . $post_old;
@@ -505,7 +505,7 @@ We recommend using upercase letters surounded by one underscore.
 			  (?!  $re_identifier )  # not following 
 		      /$transform{$1}/xg;
 	}
-	return $tmpl,\%transform; 
+	return $tmpl; #,\%transform; 
     }
     
 
