@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION="0.0.6-01";
+our $VERSION="0.0.6-04";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -15,6 +15,7 @@ use warnings;
 use B::Deparse;
 use PadWalker;
 use Attribute::Handlers;
+use Carp;
 
 
 
@@ -269,6 +270,7 @@ __ERR__
 
 =head1 Macro Management
 
+
 Macros are just ordenary subroutines and follow the same call-syntax.
 
 But at expansion time they need to be distiguished from non-macros.
@@ -276,11 +278,13 @@ But at expansion time they need to be distiguished from non-macros.
 The following routines are an abstraction layer to facilitate
 experimenting different approaches.
 
-Currently we just bless their coderef into package "Macro".
+Currently we just bless their coderef into a special package (ATM "Macro").
 
 (This is likely to change in the future, never rely on this)
 
 NB: Exported macros keep being macros.
+
+TODO: enter explanation from Perl6
 
 =cut
 
@@ -441,31 +445,30 @@ subname) should be placeholder, this module doesn't attempt to parse Perl syntax
 Placeholders should be valid identifiers and well chosen to facilitate
 later debugging.
 
-We recommend using upercase letters surounded by one underscore. 
+We recommend using upercase letters surounded by one underscore. (???)
 
 =cut
 
 {
-    my %protect;
+    my %transform;
+    my $h_oldsymbols;
     
+    #  TODO: check args
     sub protect_symbols {
-	my %args = @_;
-	%protect = (
+	my ($c_oldsub,%args) = @_;
+
+	my %protect = (
 	    PRE  => ['_','_'], # defaults
 	    POST => ['_','_'],
 	    %args,	       # new
 	   );
 	#use Data::Dump;
 	#dd \%protect;
-    }
-    
+	
+	# --- get old lexicals
+	$h_oldsymbols = _peek_sub($c_oldsub);
 
-    sub rename_symbols {
-	my ($tmpl,$c_oldsub)=@_;
-
-	my $peek = _peek_sub($c_oldsub);
-	my %transform;
-
+	# --- placeholder tags
 	my ($pre_old,$pre_new)   = @{$protect{PRE}};
 	my ($post_old,$post_new) = @{$protect{POST}};
 	
@@ -480,13 +483,23 @@ We recommend using upercase letters surounded by one underscore.
 		my $old  = $pre_old . $symbol . $post_old;
 		my $new  = $pre_new . $symbol . $post_new;
 		my $new0 = $new;
-		while ( exists $peek->{$sigil.$new} ) {
+		while ( exists $h_oldsymbols->{$sigil.$new} ) {
 		    $new = $new0 . $suffix++ . $post_new;
 		}
 		$transform{$old} = $new
 		  if $old ne $new;	
 	    }  
 	} 
+
+
+    }
+    
+    sub unprotect_symbols {
+	%transform=();
+    }
+    
+    sub rename_symbols {
+	my ($tmpl)=@_;
 
 	# symbols can't be surounded by other identifier characters
 	my $re_identifier = qr/[0-9a-zA-Z_]/; 		     
@@ -498,11 +511,11 @@ We recommend using upercase letters surounded by one underscore.
 		  sort { length($b) <=> length($a) }	    # substring last
 		    keys %transform;
 
-	    $tmpl =~ s/   (?<! $re_identifier )  # not preceding
+	    $tmpl =~ s/   (?<! $re_identifier )  # must not precede
 			  (
 			      $or_regex
 			  )
-			  (?!  $re_identifier )  # not following 
+			  (?!  $re_identifier )  # must not follow 
 		      /$transform{$1}/xg;
 	}
 	return $tmpl; #,\%transform; 
@@ -522,7 +535,7 @@ We recommend using upercase letters surounded by one underscore.
 Reevaluating deparsed subroutines disconnects closed over
 variables from the original scope.
 
-PadWalker is used for retrieving and repairing those variables.
+PadWalker is used for retrieving and redirecting those variables.
 
 But this dependency to a non-core XS-module is not very fortunate.
 

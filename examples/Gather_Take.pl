@@ -1,4 +1,4 @@
-# !perl
+# !perl -MCarp=verbose
 use strict;
 use warnings;
 
@@ -9,16 +9,20 @@ use lib '../lib';
 use Macro;
 
 my $counter;
+my %protect = (
+    '$' => [qw/ RESUME ONERUN USED /],
+    ':' => [qw/ ENTRY1 /],
+   );
 
 #-----  Iterator source templates
-my ($pre_body, $post_tmpl) = 
-   (<<'__PRE_BODY__', <<'__POST_TMPL__');
+my ($pre_body, $post_body) = 
+   (<<'__PRE_BODY__', <<'__POST_BODY__');
 {
     #-- closure vars
     my $_RESUME_;
     my $_ONERUN_=1;
    
-    return $c_iter = sub {
+    return sub {
         #-- Dispatcher
         goto $_RESUME_
             if defined $_RESUME_;
@@ -30,18 +34,22 @@ __PRE_BODY__
         return;
     };
 }
-__POST_TMPL__
+__POST_BODY__
 
 
 sub take :Macro{
   $counter++;
-  return <<"__EXPANSION__";
+  my $expansion= <<"__EXPANSION__";
     do {                         #start                    
       \$_RESUME_="_ENTRY${counter}_";
       return($_[0]);
      _ENTRY${counter}_:
     }                            #end
 __EXPANSION__
+
+  my $safe_expansion = Macro::rename_symbols($expansion);
+  return $safe_expansion;
+  
 }
 
 
@@ -52,27 +60,45 @@ __EXPANSION__
 
 sub gather (&) {
   my $c_block=shift;
-  $counter=0;
-  my $body = Macro::expand_coderef($c_block);
+  $counter=0;						    # reset closure
+
+  # --- protect new symbols
+  Macro::protect_symbols($c_block,%protect);
+
+  # --- expand macros in block to code
+  my $body = Macro::expand2text($c_block);
+
+  # --- read lexical closure
   my $h_closed_over = Macro::_closed_over($c_block);
 
+  # --- declare closure vars 
   my $closure_vars    = join ",", keys %{ $h_closed_over };
-  my $my_closure = "";
-  $my_closure    = "my ( $closure_vars );" if $closure_vars;
+  my $my_closure = $closure_vars ? "my ( $closure_vars );" : "";
 
-#    print
+  # --- rename conflicting symbols
+  my $pre_body  = Macro::rename_symbols($pre_body );
+  my $post_body = Macro::rename_symbols($post_body);
+  
+  # --- reeval template
+  print
   my $iter_source = qq{
 $my_closure
 $pre_body
 #----- START BODY
 $body
 #----- END BODY
-$post_tmpl
+$post_body 
 };
 
-  my $c_iter;
-  $c_iter = eval "$iter_source";
+  my $c_iter = eval "$iter_source";
+
+  # --- reconnect closure
   Macro::_set_closed_over( $c_iter, $h_closed_over );
+
+  # --- reset protection
+  Macro::unprotect_symbols();
+  
+  # --- return gather iterator
   return $c_iter;
 }
 
@@ -85,7 +111,9 @@ $post_tmpl
 
 
 my $outer="Closed over log: ";
+my $_ONERUN_ = 'over';					    # Hygiene test
 my $iter = gather {
+    my $_RESUME_= 'inner'.$_ONERUN_;					    # Hygiene test
     for (state $i = 0; $i <= 20; ++$i) {
 	take($i) if $i % 2;
 	$outer .= "$i ";

@@ -5,16 +5,6 @@ use lib '../lib';
 use Macro;
 
 
-Macro::protect_symbols(
-    	PRE  => ['<','_'],
-	POST => ['>','_'],
-	'$'  => [qw/ SCALAR42 SUPER/],
-	'%'  => [qw/ HASH666 /],
-	'@'  => [qw/ ARRAY123 /],
-	':'  => [qw/ LABLE /],
-       );
-
-my $tmpl = '$<SCALAR42>, %<HASH666>, @<ARRAY123>, $<SUPER>';
 
 
 
@@ -28,14 +18,28 @@ my $c_old_sub = sub {
     my @_ARRAY123_ =();
 };
 
+Macro::protect_symbols(
+    $c_old_sub,
+        PRE  => ['<','_'],
+	POST => ['>','_'],
+	'$'  => [qw/ SCALAR42 SUPER/],
+	'%'  => [qw/ HASH666 /],
+	'@'  => [qw/ ARRAY123 /],
+	':'  => [qw/ LABLE /],
+       );
+
+my $tmpl = '$<SCALAR42>, %<HASH666>, @<ARRAY123>, $<SUPER>';
+
+
+
 use Data::Dump;
 # dd Macro::_peek_sub($c_old_sub);
 
 
-dd Macro::rename_symbols($tmpl,$c_old_sub);      
+dd Macro::rename_symbols($tmpl);      
 
 is (
-    Macro::rename_symbols($tmpl,$c_old_sub),
+    Macro::rename_symbols($tmpl),
     "\$_SCALAR42_b_, %_HASH666_a_, \@_ARRAY123_a_, \$_SUPER_a_",
     "Symbol protection!"
    );
