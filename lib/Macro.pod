@@ -6,7 +6,7 @@ Macro - Expanding code with LISP like macros
 
 =head1 VERSION
 
-This document describes Macro version 0.0.6-03
+This document describes Macro version 0.0.6-05
 
 
 =head1 SYNOPSIS
@@ -111,7 +111,8 @@ lexicals.
 Returns coderef.
 
 * ??? rename?
- - eval_body 
+ - eval_body
+ - reeval_sub
 =cut
 
 

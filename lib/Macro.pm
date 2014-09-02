@@ -1,6 +1,6 @@
 package Macro;
 
-our $VERSION="0.0.6-04";
+our $VERSION="0.0.6-05";
 
 # ----------------------------------------
 #  Modulino Testing
@@ -169,7 +169,8 @@ sub expand {
 
   #local $DEBUG=1;
   my ($c_old, $subname);
-
+  
+  # --- extract old coderef
   my $subtype = ref $sub;
   if ($subtype eq "CODE") {
       $c_old = $sub;
@@ -226,7 +227,8 @@ lexicals.
 Returns coderef.
 
 * ??? rename?
- - eval_body 
+ - eval_body
+ - reeval_sub
 =cut
 
 sub body2coderef {
@@ -249,6 +251,7 @@ sub body2coderef {
     sub $t_body
 __CODE__
 }
+
   
   # TODO Errormessage
   if ($@ or !$c_sub) {

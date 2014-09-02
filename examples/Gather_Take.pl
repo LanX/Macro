@@ -1,4 +1,4 @@
-# !perl -MCarp=verbose
+#!perl 
 use strict;
 use warnings;
 
@@ -147,18 +147,21 @@ For details sie [wp://Macro Hygiene] in WP.
  =cut
 
 {
-    my OLD_closed_over;
+    my Old_Over;
     {
-	my NEW_closed_over;
+	my New_Over;
 
-	sub NEW_SUB {
-	    PreTEMPLATE;
+	sub New_Sub {
+            my New_Under;
+	    Pre_Template;
 	    OLD_BODY {
+                package Old_Package;
+                my Old_Under;
 		# ... ;
 		MACRO();
 		# ... ;
 	    };
-	    PostTEMPLATE;
+	    Post_Template;
 	}
     }
 }
