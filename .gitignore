@@ -24,3 +24,15 @@ tramp
 
 # session files
 session
+
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+Macro-*
+Macro-*/
+.releaserc
+cover_db
+MYMETA.*
