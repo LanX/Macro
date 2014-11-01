@@ -13,6 +13,11 @@ WriteMakefile(
     PREREQ_PM    => {
         'Test::More'    => 0,
         'version'       => 0,
+        'B::Deparse'    => 0,
+        'PadWalker'     => 0,
+        'Attribute::Handlers' => 0,
+        'Carp'          => 0,
+
     },
     dist            => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean           => { FILES => 'lib/Macro.pm-*' },
