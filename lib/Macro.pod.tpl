@@ -22,7 +22,10 @@ This document describes Macro version §<VERSION>§
 =head1 DESCRIPTION
 
 =for readme_stop
-For a full description see module's documentation in L<Macro>
+For a full description see module's documentation Macro.pod
+(no idea now how to link there with POD directives)
+=for html <a href="./lib/Macro.pod">HTML-link</a>
+
 
 =for author_to_fill_in
     Write a full description of the module and its features here.
