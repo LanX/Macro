@@ -15,7 +15,7 @@ This document describes Macro version 0.0.6-05
 
 =head1 DESCRIPTION
 
-    For a full description see POD
+    For a full description see module's documentation in L<Macro>
 
 
 

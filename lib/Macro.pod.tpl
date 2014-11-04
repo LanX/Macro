@@ -22,7 +22,7 @@ This document describes Macro version §<VERSION>§
 =head1 DESCRIPTION
 
 =for readme_stop
-    For a full description see POD
+    For a full description see module's documentation in L<Macro>
 
 =for author_to_fill_in
     Write a full description of the module and its features here.
