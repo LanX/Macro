@@ -144,7 +144,7 @@ Various techniques are know in languages like LISP, such as
 For details sie [wp://Macro Hygiene] in WP.
 
 
- =cut
+=cut
 
 {
     my Old_Over;
