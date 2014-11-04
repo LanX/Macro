@@ -141,8 +141,7 @@ Various techniques are know in languages like LISP, such as
 - using reserved namespaces,
 - Convention: prepending full module-name to symbol
 
-For details sie [wp://Macro Hygiene] in WP.
-
+For details see [wp://Macro Hygiene] in WP.
 
 =cut
 
