@@ -1,0 +1,36 @@
+
+=head1 NAME
+
+Macro - Expanding code with LISP like macros
+
+
+=head1 VERSION
+
+This document describes Macro version 0.0.6-05
+
+
+=head1 SYNOPSIS
+
+    use Macro;
+
+=head1 DESCRIPTION
+
+    For a full description see POD
+
+
+
+=head1 AUTHOR
+
+Rolf Michael Langsdorf  C<< lanx@cpan.org >>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014, Rolf Michael Langsdorf C<< lanx@cpan.org >>.
+All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See C<perldoc perlartistic>.
+
+
+

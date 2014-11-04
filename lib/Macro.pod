@@ -1,4 +1,3 @@
-
 =head1 NAME
 
 Macro - Expanding code with LISP like macros
@@ -13,26 +12,11 @@ This document describes Macro version 0.0.6-05
 
     use Macro;
 
-=for author_to_fill_in
-    Brief code example(s) here showing commonest usage(s).
-    This section will be as far as many users bother reading
-    so make it as educational and exeplary as possible.
-
 =head1 DESCRIPTION
-
-=for author_to_fill_in
-    Write a full description of the module and its features here.
-    Use subsections (=head2, =head3) as appropriate.
 
 
 =head1 INTERFACE
 
-
-=for author_to_fill_in
-    Write a separate section listing the public components of the modules
-    interface. These normally consist of either subroutines that may be
-    exported, or methods that may be called on objects belonging to the
-    classes provided by the module.
 
 
 
@@ -47,17 +31,7 @@ CAUTION: Only one level expansion implemented yet.
 
 Arguments tunneld to deparse2text(@_)
 
-=for TODO
- ** ??? rename?
-  -  expand_sub2source
-  -  expand_source OBJ
-  -  expand_deparse
-   OBJ = coderef/subname
-         sub_body?
-         glob? *func
-  - expand2txt sub, exp-level
-  - deparse    sub, exp-level
-        
+
 =cut
 
 
@@ -92,12 +66,6 @@ No side effect!
 
 
 
-
-=for TODO
-* Glob passing?
- - is package known?
-* ??? rename?
--  expand sub, exp-level, %opt
 
 
 =cut
@@ -325,12 +293,6 @@ debug output, controled by global $DEBUG
 
 =head1 DIAGNOSTICS
 
-=for author_to_fill_in
-    List every single error and warning message that the module can
-    generate (even the ones that will ''never happen''), with a full
-    explanation of each problem, one or more likely causes, and any
-    suggested remedies.
-
 =over
 
 =item C<< Error message here, perhaps with %s placeholders >>
@@ -348,23 +310,10 @@ debug output, controled by global $DEBUG
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-=for author_to_fill_in
-    A full explanation of any configuration system(s) used by the
-    module, including the names and locations of any configuration
-    files, and the meaning of any environment variables or properties
-    that can be set. These descriptions must also include details of any
-    configuration language used.
-
 Macro requires no configuration files or environment variables.
 
 
 =head1 DEPENDENCIES
-
-=for author_to_fill_in
-    A list of all the other modules that this module relies upon,
-    including any restrictions on versions, and an indication whether
-    the module is part of the standard Perl distribution, part of the
-    module's distribution, or must be installed separately. ]
 
 
 =head2 C<B::Deparse>
@@ -384,26 +333,10 @@ In other cases not needed, might become optional.
 
 =head1 INCOMPATIBILITIES
 
-=for author_to_fill_in
-    A list of any modules that this module cannot be used in conjunction
-    with. This may be due to name conflicts in the interface, or
-    competition for system or program resources, or due to internal
-    limitations of Perl (for example, many modules that use source code
-    filters are mutually incompatible).
-
 None reported.
 
 
 =head1 BUGS AND LIMITATIONS
-
-=for author_to_fill_in
-    A list of known problems with the module, together with some
-    indication Whether they are likely to be fixed in an upcoming
-    release. Also a list of restrictions on the features the module
-    does provide: data types that cannot be handled, performance issues
-    and the circumstances in which they may arise, practical
-    limitations on the size of data sets, special cases that are not
-    (yet) handled, etc.
 
 =head2 Expansion level
 
@@ -413,7 +346,6 @@ This will be addressed in future versions.
 Please report any bugs or feature requests to
 C<bug-Macro@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
-
 
 =head1 AUTHOR
 

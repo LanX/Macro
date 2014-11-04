@@ -90,7 +90,8 @@ Arguments tunneld to deparse2text(@_)
          glob? *func
   - expand2txt sub, exp-level
   - deparse    sub, exp-level
-        
+
+
 =cut
 
   

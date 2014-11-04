@@ -1,3 +1,4 @@
+=for readme_start
 
 =head1 NAME
 
@@ -19,6 +20,9 @@ This document describes Macro version §<VERSION>§
     so make it as educational and exeplary as possible.
 
 =head1 DESCRIPTION
+
+=for readme_stop
+    For a full description see POD
 
 =for author_to_fill_in
     Write a full description of the module and its features here.
@@ -131,6 +135,7 @@ Please report any bugs or feature requests to
 C<bug-Macro@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>.
 
+=for readme_start
 
 =head1 AUTHOR
 
@@ -144,6 +149,8 @@ All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See C<perldoc perlartistic>.
+
+=for readme_stop
 
 
 =head1 DISCLAIMER OF WARRANTY
