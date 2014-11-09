@@ -9,9 +9,15 @@ WriteMakefile(
     VERSION_FROM    => 'lib/Macro.pm',
     ABSTRACT_FROM   => 'lib/Macro.pod.tpl',
     PL_FILES        => {},
+    MIN_PERL_VERSION => '5.010000', # for examples/Gather_Take.pl, otherwise 5.6.0
     PREREQ_PM    => {
         'Test::More'    => 0,
         'version'       => 0,
+        'B::Deparse'    => 0,
+        'PadWalker'     => 0,
+        'Attribute::Handlers' => 0,
+        'Carp'          => 0,
+
     },
     dist            => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean           => { FILES => 'lib/Macro.pm-*' },
