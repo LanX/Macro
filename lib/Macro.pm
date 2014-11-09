@@ -36,26 +36,27 @@ sub import {
 
 
 {
-    my $c_pp_entersub_orig;
+    package Macro::B_Deparse;
+
+    use base 'B::Deparse';
 
 
-    my $c_pp_entersub_wrapper = sub
-      {
-	  my ($self, $op, $cx ) = @_;
+    sub pp_entersub {
+	  my $self = shift;
   
 	  #- original text of sub-call
-	  my $entersub_text = $c_pp_entersub_orig->(@_);
-	  dbout( "entersub_text: $entersub_text" );
+	  my $entersub_text = $self->SUPER::pp_entersub(@_);
+	  Macro::dbout( "entersub_text: $entersub_text" );
 
 	  #- decompose call_text 
 	  my ( $fullname, $args ) = ( $entersub_text =~ m/ ([:\w]+) \( (.*) \) /x );
-	  dbout( "name: $fullname, args: $args" );
+	  Macro::dbout( "name: $fullname, args: $args" );
 
 	  #- subname may not be fully quallyfied
 	  my $current_package = $self->{'curstash'};
-	  dbout( "$current_package" );
+	  Macro::dbout( "$current_package" );
 
-	  my $c_macro = ref_macro ( $fullname, $current_package );
+	  my $c_macro = Macro::ref_macro ( $fullname, $current_package );
 
 	  #- ignore normal subs
 	  return $entersub_text unless $c_macro; 
@@ -66,8 +67,8 @@ sub import {
 
 	  # return macro expansion text
 	  return $c_macro->(@args);
-      };
-
+      }
+}
 
 =head2 expand2text CODEREF  
 
@@ -97,23 +98,10 @@ Arguments tunneld to deparse2text(@_)
   
 
 sub expand2text {
-        
-    #- save original
-    $c_pp_entersub_orig	       = \&B::Deparse::pp_entersub;
-
-    # - install wrapper
-    no warnings "redefine";
-    local *B::Deparse::pp_entersub = $c_pp_entersub_wrapper;
 
     # - return deparsed text
     return deparse2text(@_)
 }
-
-
-
-
-}
-
 
 
 =head2 deparse2text
@@ -127,7 +115,7 @@ Return deparsed code for coderef w/o expansion
 sub deparse2text {
   my ($coderef) = @_;
   
-  my $deparse_obj    = B::Deparse->new( "-q","-p","-si4");
+  my $deparse_obj    = Macro::B_Deparse->new( "-q","-p","-si4");
   return $deparse_obj->coderef2text( $coderef );
 }
 
